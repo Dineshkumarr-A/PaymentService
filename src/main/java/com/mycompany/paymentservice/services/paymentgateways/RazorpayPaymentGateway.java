@@ -10,6 +10,9 @@ import com.razorpay.Payment;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 @Component
 @Primary
 public class RazorpayPaymentGateway implements IPaymentGateway {
@@ -24,12 +27,17 @@ public class RazorpayPaymentGateway implements IPaymentGateway {
     @Override
     public String createPaymentLint(String orderId) {
 
+        Instant expireBy = Instant.now().plus(15, ChronoUnit.MINUTES);
+
+        // Convert expireBy to epoch seconds
+        long expireByEpochSeconds = expireBy.getEpochSecond();
+
         JSONObject paymentLinkRequest = new JSONObject();
         paymentLinkRequest.put("amount",1000);
         paymentLinkRequest.put("currency","INR");
 //        paymentLinkRequest.put("accept_partial",true);
 //        paymentLinkRequest.put("first_min_partial_amount",100);
-        paymentLinkRequest.put("expire_by",1691097057);
+        paymentLinkRequest.put("expire_by",expireByEpochSeconds);
         paymentLinkRequest.put("reference_id",orderId);
         paymentLinkRequest.put("description","Payment for policy no #" + orderId);
         JSONObject customer = new JSONObject();
@@ -48,8 +56,15 @@ public class RazorpayPaymentGateway implements IPaymentGateway {
         paymentLinkRequest.put("callback_url","https://example-callback-url.com/");
         paymentLinkRequest.put("callback_method","get");
 
-        PaymentLink payment = _razorpayClient.paymentLink.create(paymentLinkRequest);
+        PaymentLink payment = null;
+        try {
+            payment = _razorpayClient.paymentLink.create(paymentLinkRequest);
+        }
+        catch (Exception ex)
+        {
+            System.out.println(ex.getMessage());
+        }
 
-        return null;
+        return payment.toString();
     }
 }

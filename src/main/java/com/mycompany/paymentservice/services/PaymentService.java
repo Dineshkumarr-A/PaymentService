@@ -15,6 +15,6 @@ public class PaymentService implements IPaymentService {
 
     @Override
     public String createPaymentLink(String orderId) {
-        return null;
+        return _paymentGateway.createPaymentLint(orderId);
     }
 }
