@@ -27,7 +27,7 @@ public class RazorpayPaymentGateway implements IPaymentGateway {
     @Override
     public String createPaymentLint(String orderId) {
 
-        Instant expireBy = Instant.now().plus(15, ChronoUnit.MINUTES);
+        Instant expireBy = Instant.now().plus(30, ChronoUnit.MINUTES);
 
         // Convert expireBy to epoch seconds
         long expireByEpochSeconds = expireBy.getEpochSecond();
